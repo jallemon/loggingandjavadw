@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="carjson" format="json">
+      <types:shape format="weave" example="examples/carjson.json"><![CDATA[%dw 2.0
+
+type carjson = {|
+  Make: String, 
+  Model: String, 
+  Year: Number {"typeId": "int"}
+|} {"example": "{\\\"Make\\\":\\\"Toyota\\\",\\\"Model\\\":\\\"Camry\\\",\\\"Year\\\":2017}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#3af1dca0-eafb-400d-a298-143eb45bcaff">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="carjson"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

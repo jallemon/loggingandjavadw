@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b2274f87-d6cf-4306-a4cf-f4f680d48bbe" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="loggingandjavaFlow" doc:id="9763dca9-3d72-4d35-9664-f1e9c875ca2c" >
+		<http:listener doc:name="Listener" doc:id="3af1dca0-eafb-400d-a298-143eb45bcaff" config-ref="HTTP_Listener_config" path="/log"/>
+		<ee:transform doc:name="Transform Message" doc:id="0d7c496c-dbdf-4b35-aa48-6acb66b682e9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+log("Vehicle Make: " ++ payload.Make)
+++
+log("Vehicle Model: " ++ payload.Model)
+++
+log("Vehicle Year: " ++ payload.Year)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="loggingandjavaFlow1" doc:id="55d1a283-15c2-42d9-a0a5-dad19ac8f7e8" >
+		<http:listener doc:name="Listener" doc:id="de9d7f03-c237-4e75-a9b8-e181d04006a1" config-ref="HTTP_Listener_config" path="/javaclass/{uriparam}/"/>
+		<set-variable value="Cognizant" doc:name="stringValue" doc:id="6495d945-4f5d-422f-9d20-0c611a6b507e" variableName="string"/>
+		<ee:transform doc:name="Transform Message" doc:id="4a81e135-5ab9-48d9-b991-4ef1567b72be" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import java!loggingandjava::TestSubstring
+
+output application/json
+---
+{
+	"a":TestSubstring::getSubString(attributes.queryParams['queryString']),
+	"b":message.attributes.uriParams['uriparam']
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
